@@ -7,7 +7,7 @@ export default function HomePage() {
         <h1>Range Component Exercise</h1>
         <p>
           Custom range slider component with two different modes. Built with Next.js 15, TypeScript,
-          and comprehensive accessibility support.
+          with accessibility support.
         </p>
       </section>
 
