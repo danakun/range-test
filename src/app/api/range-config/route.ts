@@ -1,7 +1,7 @@
 // For Normal Range
 import { NextResponse } from 'next/server';
 
-// Mock data for normal range configuration
+// normal range configuration
 const rangeConfig = {
   min: 1,
   max: 100

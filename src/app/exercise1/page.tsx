@@ -1,8 +1,9 @@
+import { API_ENDPOINTS } from '@/lib/endpoints';
 import Range from '@/components/Range/Range';
 import { RangeConfig } from '@/components/Range/Range.types';
 
 async function getRangeConfig(): Promise<RangeConfig> {
-  const res = await fetch('http://localhost:8080/api/range-config', {
+  const res = await fetch(API_ENDPOINTS.rangeConfig, {
     cache: 'no-store'
   });
 

@@ -1,8 +1,9 @@
+import { API_ENDPOINTS } from '@/lib/endpoints';
 import Range from '@/components/Range/Range';
 import { FixedValuesConfig } from '@/components/Range/Range.types';
 
 async function getFixedValues(): Promise<FixedValuesConfig> {
-  const res = await fetch('http://localhost:8080/api/fixed-values', {
+  const res = await fetch(API_ENDPOINTS.fixedValues, {
     cache: 'no-store'
   });
 

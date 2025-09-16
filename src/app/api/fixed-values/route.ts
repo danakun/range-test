@@ -1,14 +1,14 @@
 // For Fixed Values
 import { NextResponse } from 'next/server';
 
-// Mock data for fixed values range
+// fixed values range
 const fixedValuesConfig = {
   rangeValues: [1.99, 5.99, 10.99, 30.99, 50.99, 70.99]
 };
 
 export async function GET() {
   try {
-    // Simulate API delay
+    // simulate API delay
     await new Promise(resolve => setTimeout(resolve, 150));
 
     return NextResponse.json(fixedValuesConfig);
