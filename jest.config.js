@@ -1,4 +1,4 @@
-const nextJest = require('next/jest');
+import nextJest from 'next/jest';
 
 /** @type {import('jest').Config} */
 const createJestConfig = nextJest({
@@ -16,4 +16,4 @@ const config = {
   collectCoverageFrom: ['src/**/*.{js,jsx,ts,tsx}', '!src/**/*.d.ts']
 };
 
-module.exports = createJestConfig(config);
+export default createJestConfig(config);
