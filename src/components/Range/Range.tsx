@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { RangeProps } from './Range.types';
 import styles from './Range.module.css';
 
@@ -32,44 +32,51 @@ export default function Range({ mode, config }: RangeProps) {
 
   const step = mode === 'normal' ? 1 : 1;
 
-  const calculateValueToPercentage = (val: number) => {
-    if (mode === 'normal') {
-      const range = config.max - config.min;
-      if (range === 0) return 0;
-      return ((val - config.min) / range) * 100;
-    }
-
-    if (config.rangeValues.length === 0) return 0;
-    const i = config.rangeValues.indexOf(val);
-    if (i === -1) return 0;
-    if (config.rangeValues.length === 1) return 0;
-    return (i / (config.rangeValues.length - 1)) * 100;
-  };
-
-  const calculatePixelToValue = (x: number) => {
-    if (!trackRef.current) return 0;
-    const rect = trackRef.current.getBoundingClientRect();
-    const pct = Math.max(0, Math.min(1, (x - rect.left) / rect.width));
-
-    if (mode === 'normal') {
-      return config.min + pct * (config.max - config.min);
-    } else {
+  const calculateValueToPercentage = useCallback(
+    (val: number) => {
+      if (mode === 'normal') {
+        const range = config.max - config.min;
+        if (range === 0) return 0;
+        return ((val - config.min) / range) * 100;
+      }
       if (config.rangeValues.length === 0) return 0;
-      const idx = Math.round(pct * (config.rangeValues.length - 1));
-      return config.rangeValues[idx] || 0;
-    }
-  };
+      const i = config.rangeValues.indexOf(val);
+      if (i === -1) return 0;
+      if (config.rangeValues.length === 1) return 0;
+      return (i / (config.rangeValues.length - 1)) * 100;
+    },
+    [mode, config]
+  );
 
-  const snapValueToStep = (val: number) => {
-    if (mode === 'normal') {
-      return Math.round(val / step) * step;
-    } else {
-      if (config.rangeValues.length === 0) return 0;
-      return config.rangeValues.reduce((prev, curr) =>
-        Math.abs(curr - val) < Math.abs(prev - val) ? curr : prev
-      );
-    }
-  };
+  const calculatePixelToValue = useCallback(
+    (x: number) => {
+      if (!trackRef.current) return 0;
+      const rect = trackRef.current.getBoundingClientRect();
+      const pct = Math.max(0, Math.min(1, (x - rect.left) / rect.width));
+      if (mode === 'normal') {
+        return config.min + pct * (config.max - config.min);
+      } else {
+        if (config.rangeValues.length === 0) return 0;
+        const idx = Math.round(pct * (config.rangeValues.length - 1));
+        return config.rangeValues[idx] || 0;
+      }
+    },
+    [trackRef, mode, config]
+  );
+
+  const snapValueToStep = useCallback(
+    (val: number) => {
+      if (mode === 'normal') {
+        return Math.round(val / step) * step;
+      } else {
+        if (config.rangeValues.length === 0) return 0;
+        return config.rangeValues.reduce((prev, curr) =>
+          Math.abs(curr - val) < Math.abs(prev - val) ? curr : prev
+        );
+      }
+    },
+    [mode, step, config]
+  );
 
   const handleLabelEditStart = (type: 'min' | 'max') => {
     if (mode === 'fixed') return;
@@ -123,7 +130,7 @@ export default function Range({ mode, config }: RangeProps) {
     if (editingLabel) {
       setTempValue(rangeValues[`${editingLabel}Value`].toString());
     }
-  }, [rangeValues.minValue, rangeValues.maxValue, editingLabel]);
+  }, [rangeValues, rangeValues.minValue, rangeValues.maxValue, editingLabel]);
 
   useEffect(() => {
     const handlePointerMove = (e: PointerEvent) => {
@@ -175,7 +182,7 @@ export default function Range({ mode, config }: RangeProps) {
       document.removeEventListener('pointermove', handlePointerMove);
       document.removeEventListener('pointerup', handlePointerUp);
     };
-  }, [activeHandle, step, mode, config]);
+  }, [activeHandle, step, mode, config, calculatePixelToValue, snapValueToStep, setRangeValues]);
 
   const handleKeydown = (handle: 'min' | 'max') => (e: React.KeyboardEvent) => {
     if (e.key === 'Tab') {
