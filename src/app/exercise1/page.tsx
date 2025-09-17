@@ -27,6 +27,8 @@ export default async function Exercise1Page() {
       </main>
     );
   } catch (error) {
+    console.error('Failed to load range values:', error);
+
     return (
       <main>
         <section className='section'>

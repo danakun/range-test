@@ -13,6 +13,8 @@ export async function GET() {
 
     return NextResponse.json(fixedValuesConfig);
   } catch (error) {
+    console.error('API error in fixed-values route:', error);
+
     return NextResponse.json(
       { error: 'Failed to fetch fixed values configuration' },
       { status: 500 }

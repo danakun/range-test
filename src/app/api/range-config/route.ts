@@ -14,6 +14,7 @@ export async function GET() {
 
     return NextResponse.json(rangeConfig);
   } catch (error) {
+    console.error('API error in normal values route:', error);
     return NextResponse.json({ error: 'Failed to fetch range configuration' }, { status: 500 });
   }
 }

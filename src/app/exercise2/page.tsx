@@ -26,8 +26,9 @@ export default async function Exercise2Page() {
         </section>
       </main>
     );
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
+    console.error('Failed to load range values:', error);
+
     return (
       <main>
         <section className='section'>
