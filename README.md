@@ -2,7 +2,7 @@
 
 Custom range slider component built with Next.js, TypeScript, and comprehensive testing.
 
-[https://range-test-expxriyir-dana-kuns-projects.vercel.app/](https://range-test-expxriyir-dana-kuns-projects.vercel.app/)
+[https://range-test-gamma.vercel.app/](https://range-test-gamma.vercel.app/)
 
 ## Getting Started
 
