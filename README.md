@@ -2,6 +2,8 @@
 
 Custom range slider component built with Next.js, TypeScript, and comprehensive testing.
 
+[https://range-test-expxriyir-dana-kuns-projects.vercel.app/](https://range-test-expxriyir-dana-kuns-projects.vercel.app/)
+
 ## Getting Started
 
 ### Prerequisites
@@ -14,8 +16,7 @@ Custom range slider component built with Next.js, TypeScript, and comprehensive 
 1. Clone the repository
 
 ```bash
-git clone <your-repo-url>
-cd range-component-exercise
+git clone https://github.com/danakun/range-test.git
 ```
 
 2. Install dependencies
@@ -31,6 +32,7 @@ npm run dev
 ```
 
 4. Open [http://localhost:3000](http://localhost:3000) in your browser
+
 
 ## Features
 
