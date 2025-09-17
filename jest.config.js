@@ -1,4 +1,5 @@
-import nextJest from 'next/jest';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const nextJest = require('next/jest');
 
 /** @type {import('jest').Config} */
 const createJestConfig = nextJest({
@@ -16,4 +17,4 @@ const config = {
   collectCoverageFrom: ['src/**/*.{js,jsx,ts,tsx}', '!src/**/*.d.ts']
 };
 
-export default createJestConfig(config);
+module.exports = createJestConfig(config);
