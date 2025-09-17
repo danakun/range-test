@@ -133,9 +133,18 @@ export default function Range({ mode, config }: RangeProps) {
   }, [rangeValues, rangeValues.minValue, rangeValues.maxValue, editingLabel]);
 
   useEffect(() => {
-    const handlePointerMove = (e: PointerEvent) => {
+    const handleMove = (e: PointerEvent | TouchEvent) => {
       if (!activeHandle) return;
-      const raw = calculatePixelToValue(e.clientX);
+
+      let clientX: number;
+      if ('touches' in e) {
+        if (e.touches.length === 0) return;
+        clientX = e.touches[0].clientX;
+      } else {
+        clientX = e.clientX;
+      }
+
+      const raw = calculatePixelToValue(clientX);
       const val = snapValueToStep(raw);
 
       setRangeValues(prev => {
@@ -172,17 +181,34 @@ export default function Range({ mode, config }: RangeProps) {
       });
     };
 
-    const handlePointerUp = () => setActiveHandle(null);
+    const handleEnd = () => {
+      setActiveHandle(null);
+    };
 
     if (activeHandle) {
-      document.addEventListener('pointermove', handlePointerMove);
-      document.addEventListener('pointerup', handlePointerUp);
+      document.addEventListener('pointermove', handleMove as EventListener);
+      document.addEventListener('touchmove', handleMove as EventListener);
+
+      document.addEventListener('pointerup', handleEnd);
+      document.addEventListener('touchend', handleEnd);
+      document.addEventListener('pointercancel', handleEnd);
+      document.addEventListener('touchcancel', handleEnd);
+
+      window.addEventListener('blur', handleEnd);
+      document.addEventListener('visibilitychange', handleEnd);
     }
+
     return () => {
-      document.removeEventListener('pointermove', handlePointerMove);
-      document.removeEventListener('pointerup', handlePointerUp);
+      document.removeEventListener('pointermove', handleMove as EventListener);
+      document.removeEventListener('touchmove', handleMove as EventListener);
+      document.removeEventListener('pointerup', handleEnd);
+      document.removeEventListener('touchend', handleEnd);
+      document.removeEventListener('pointercancel', handleEnd);
+      document.removeEventListener('touchcancel', handleEnd);
+      window.removeEventListener('blur', handleEnd);
+      document.removeEventListener('visibilitychange', handleEnd);
     };
-  }, [activeHandle, step, mode, config, calculatePixelToValue, snapValueToStep, setRangeValues]);
+  }, [activeHandle, step, mode, config, calculatePixelToValue, snapValueToStep]);
 
   const handleKeydown = (handle: 'min' | 'max') => (e: React.KeyboardEvent) => {
     if (e.key === 'Tab') {
