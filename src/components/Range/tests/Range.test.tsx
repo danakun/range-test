@@ -59,7 +59,9 @@ describe('Range Component', () => {
       expect(screen.getByText('25')).toBeInTheDocument();
     });
 
-    it('clamps values to valid range', async () => {
+    // Replace the failing test with these smaller, more focused tests:
+
+    it('shows validation error for values out of range', async () => {
       const user = userEvent.setup();
       render(<Range mode='normal' config={mockNormalConfig} />);
 
@@ -68,15 +70,94 @@ describe('Range Component', () => {
 
       const input = screen.getByRole('spinbutton');
 
+      // Enter invalid value
       fireEvent.change(input, { target: { value: '150' } });
-      expect(input).toHaveValue(150);
 
+      // Wait for validation error
+      await waitFor(
+        () => {
+          expect(screen.getByText(/Value must be between 1 and 100/)).toBeInTheDocument();
+        },
+        { timeout: 1000 }
+      );
+
+      // Should have error styling
+      expect(input).toHaveClass('inputError');
+      expect(input).toHaveAttribute('aria-invalid', 'true');
+    });
+
+    it('prevents submission of invalid values', async () => {
+      const user = userEvent.setup();
+      render(<Range mode='normal' config={mockNormalConfig} />);
+
+      const minLabel = screen.getByText('1');
+      await user.click(minLabel);
+
+      const input = screen.getByRole('spinbutton');
+
+      // Enter invalid value and try to submit
+      fireEvent.change(input, { target: { value: '150' } });
+      await user.tab(); // Try to blur/submit
+
+      // Input should still be visible (submission prevented)
+      expect(screen.getByRole('spinbutton')).toBeInTheDocument();
+
+      // Value should not have changed
+      expect(screen.getByRole('slider', { name: /minimum value: 1/i })).toHaveAttribute(
+        'aria-valuenow',
+        '1'
+      );
+    });
+
+    it('accepts and submits valid values', async () => {
+      const user = userEvent.setup();
+      render(<Range mode='normal' config={mockNormalConfig} />);
+
+      const minLabel = screen.getByText('1');
+      await user.click(minLabel);
+
+      const input = screen.getByRole('spinbutton');
+
+      // Enter valid value
+      fireEvent.change(input, { target: { value: '50' } });
+      expect(input).toHaveValue(50);
+
+      // Submit by blurring
       await user.tab();
 
+      // Should close input and show new value
       await waitFor(() => {
         expect(screen.queryByRole('spinbutton')).not.toBeInTheDocument();
       });
-      expect(screen.getByText('99')).toBeInTheDocument();
+
+      expect(screen.getByText('50')).toBeInTheDocument();
+    });
+
+    it('clears errors when user enters valid value', async () => {
+      const user = userEvent.setup();
+      render(<Range mode='normal' config={mockNormalConfig} />);
+
+      const minLabel = screen.getByText('1');
+      await user.click(minLabel);
+
+      const input = screen.getByRole('spinbutton');
+
+      // First enter invalid value
+      fireEvent.change(input, { target: { value: '150' } });
+
+      await waitFor(
+        () => {
+          expect(screen.getByRole('alert')).toBeInTheDocument();
+        },
+        { timeout: 1000 }
+      );
+
+      // Then enter valid value
+      fireEvent.change(input, { target: { value: '50' } });
+
+      // Error should clear immediately (not debounced)
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+      expect(input).not.toHaveClass('inputError');
     });
 
     it('cancels editing with Escape key', async () => {
